@@ -16,9 +16,23 @@ const compileParam = {
 model.compile(compileParam);
 
 function runFit(times?: number) {
-  const fitParam = { epochs: times ? times * 100 : 100 };
+  const fitParam = {
+    epochs: times ? times * 100 : 100,
+    callbacks: {
+      onEpochEnd: (epoch, logs) => {
+        console.log('epoch', epoch, logs, 'RMSE: ', Math.sqrt(logs.loss));
+      },
+    },
+  };
   model.fit(src, dst, fitParam).then(result => {
     const predictData = model.predict(src);
     (predictData as tf.Tensor<tf.Rank>).print();
   });
+}
+
+function newTest() {
+  const newData = [30, 60, 72, 127];
+  const transData = tf.tensor(newData);
+  const predictData = model.predict(transData);
+  (predictData as tf.Tensor<tf.Rank>).print();
 }
